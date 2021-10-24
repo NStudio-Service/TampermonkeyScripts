@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         校园网自动登录+解除限制
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      1.0
 // @description  try to take over the world!
 // @author       NXY666
 // @match        http://10.100.1.5/*
