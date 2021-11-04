@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         校园网自动登录+解除限制
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.3
 // @description  try to take over the world!
 // @author       NXY666
 // @match        http://10.100.1.5/*
@@ -90,8 +90,16 @@ selectService = function (serviceName) {
 				}, 0);
 			} else if (document.querySelector('#loginLink')) {
 				showMsg("帐号登录");
+
 				let autoLogin = setInterval(() => {
+					let authJs = doauthen.toString()
+					.replace(
+						'window.location="success.jsp?userIndex="+authResult.userIndex+"&keepaliveInterval="+authResult.keepaliveInterval;',
+						'window.open("success.jsp?userIndex=" + authResult.userIndex + "&keepaliveInterval=" + authResult.keepaliveInterval);close();'
+					)
+					.replace("function doauthen", "doauthen = function");
 					if (document.querySelector('#username').value && document.querySelector('#pwd').value) {
+						eval(authJs);
 						scriptConfig.closeWindow = true;
 						save(scriptConfig);
 						document.querySelector('#loginLink').click();
