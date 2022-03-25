@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name    校园网助手
 // @namespace    Campus.Network.Helper
-// @version    0.5.0
+// @version    0.5
 // @description    校园网自动登录、解除30秒切换限制、主页功能球Bug修复
 // @author    NXY666
 // @match    http://10.100.1.5/*
