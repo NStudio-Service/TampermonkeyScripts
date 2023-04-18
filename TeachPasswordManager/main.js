@@ -6,15 +6,15 @@
 // @author       NXY666
 // @match        http://teach.xujc.com/student/index.php
 // @icon         http://teach.xujc.com/favicon.ico
+// @updateURL    https://raw.githubusercontents.com/NStudio-Service/TampermonkeyScripts/main/TeachPasswordManager/main.js
+// @downloadURL  https://raw.githubusercontents.com/NStudio-Service/TampermonkeyScripts/main/TeachPasswordManager/main.js
 // @grant        unsafeWindow
 // ==/UserScript==
 
 // 教师常用密码
-let teacherPass = {
-};
+let teacherPass = {};
 
-let filePass = {
-};
+let filePass = {};
 
 function storeData() {
 	localStorage.setItem("teacherPass", JSON.stringify(teacherPass));
