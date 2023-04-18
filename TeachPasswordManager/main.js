@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         教学文件系统密码管理器
 // @namespace    Teach.Password.Manager
-// @version      0.1
+// @version      0.2
 // @description  -| 密码自动补全 | 主动密码猜测 |-
 // @author       NXY666
-// @match        http://teach.xujc.com/student/index.php
+// @match        http://teach.xujc.com/student/index.php*
 // @icon         http://teach.xujc.com/favicon.ico
 // @updateURL    https://raw.githubusercontents.com/NStudio-Service/TampermonkeyScripts/main/TeachPasswordManager/main.js
 // @downloadURL  https://raw.githubusercontents.com/NStudio-Service/TampermonkeyScripts/main/TeachPasswordManager/main.js
