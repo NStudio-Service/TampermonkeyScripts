@@ -6,8 +6,8 @@
 // @author       NXY666
 // @match        http://teach.xujc.com/student/index.php*
 // @icon         http://teach.xujc.com/favicon.ico
-// @updateURL    https://raw.githubusercontents.com/NStudio-Service/TampermonkeyScripts/main/TeachPasswordManager/main.js
-// @downloadURL  https://raw.githubusercontents.com/NStudio-Service/TampermonkeyScripts/main/TeachPasswordManager/main.js
+// @updateURL    https://raw.gitmirror.com/NStudio-Service/TampermonkeyScripts/main/TeachPasswordManager/main.js
+// @downloadURL  https://raw.gitmirror.com/NStudio-Service/TampermonkeyScripts/main/TeachPasswordManager/main.js
 // @grant        unsafeWindow
 // ==/UserScript==
 
