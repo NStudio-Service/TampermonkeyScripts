@@ -10,8 +10,8 @@
 // @icon    http://a.xujc.com/eportal/interface/index_files/pc/logosuccess.png
 // @grant    unsafeWindow
 // @require    https://cdn.staticfile.org/jquery/1.12.4/jquery.min.js
-// @updateURL    https://raw.githubusercontents.com/NStudio-Service/TampermonkeyScripts/main/CampusNetworkHelper/main.js
-// @downloadURL    https://raw.githubusercontents.com/NStudio-Service/TampermonkeyScripts/main/CampusNetworkHelper/main.js
+// @updateURL    https://raw.gitmirror.com/NStudio-Service/TampermonkeyScripts/main/CampusNetworkHelper/main.js
+// @downloadURL    https://raw.gitmirror.com/NStudio-Service/TampermonkeyScripts/main/CampusNetworkHelper/main.js
 // ==/UserScript==
 
 function save(obj) {
