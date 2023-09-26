@@ -1,21 +1,25 @@
 // ==UserScript==
 // @name    校园网助手
 // @namespace    Campus.Network.Helper
-// @version    0.6
-// @description    -| 校园网自动登录 | 解除30秒切换限制 | 主页功能球Bug修复 |-
+// @version    0.7
+// @description    -| 登录页自动登录 | 解除切换运营商时间限制 | 主页功能球优化 |-
 // @author    NXY666
 // @match    http://10.100.1.5/*
 // @match    http://10.100.1.7/*
 // @match    http://a.xujc.com/*
 // @icon    http://a.xujc.com/eportal/interface/index_files/pc/logosuccess.png
 // @grant    unsafeWindow
-// @require    https://cdn.staticfile.org/jquery/1.12.4/jquery.min.js
+// @require    https://code.jquery.com/jquery-3.7.1.min.js
 // @updateURL    https://raw.gitmirror.com/NStudio-Service/TampermonkeyScripts/main/CampusNetworkHelper/main.js
 // @downloadURL    https://raw.gitmirror.com/NStudio-Service/TampermonkeyScripts/main/CampusNetworkHelper/main.js
 // ==/UserScript==
 
 function save(obj) {
 	localStorage.CN_LoginScript = JSON.stringify(obj);
+}
+
+function checkWindowCloseable() {
+	return window.opener != null || window.history.length === 1;
 }
 
 function getSpareMsgId() {
@@ -51,7 +55,7 @@ let scriptConfig = JSON.parse(localStorage.CN_LoginScript || JSON.stringify({ski
 				if (scriptConfig.closeWindow) {
 					scriptConfig.closeWindow = false;
 					save(scriptConfig);
-					if (window.opener) {
+					if (checkWindowCloseable()) {
 						window.close();
 					}
 				}
@@ -99,13 +103,19 @@ let scriptConfig = JSON.parse(localStorage.CN_LoginScript || JSON.stringify({ski
 
 				let autoLogin = setInterval(() => {
 					if (document.querySelector('#username').value && document.querySelector('#pwd').value) {
-						let authJs = doauthen.toString().replace("function doauthen", "doauthen = function");
+						clearInterval(autoLogin);
 
-						if (window.opener) {
-							authJs.replace(
-								'window.location="success.jsp?userIndex="+authResult.userIndex+"&keepaliveInterval="+authResult.keepaliveInterval;',
-								'window.open("success.jsp?userIndex="+authResult.userIndex+"&keepaliveInterval="+authResult.keepaliveInterval);'
-							);
+						const displayIsCheckNoEl = document.getElementById("disPlayIs_check_no");
+						if (displayIsCheckNoEl.style.display === "block" || displayIsCheckNoEl.style.display === "") {
+							checkIsSaveInfo();
+							showMsg("记住密码选项已自动勾选");
+							return;
+						}
+
+						if (checkWindowCloseable()) {
+							let authJs = doauthen.toString()
+							.replace("function doauthen", "doauthen = function")
+							.replace('window.location="success.jsp?userIndex="+authResult.userIndex+"&keepaliveInterval="+authResult.keepaliveInterval;', 'window.open("success.jsp?userIndex="+authResult.userIndex+"&keepaliveInterval="+authResult.keepaliveInterval);close();');
 							eval(authJs);
 
 							scriptConfig.closeWindow = true;
@@ -113,7 +123,6 @@ let scriptConfig = JSON.parse(localStorage.CN_LoginScript || JSON.stringify({ski
 						}
 
 						document.querySelector('#loginLink').click();
-						clearInterval(autoLogin);
 					}
 				}, 0);
 			} else if (document.querySelector('#offlineDiv')) {
