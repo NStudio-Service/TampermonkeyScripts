@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name    校园网助手
 // @namespace    Campus.Network.Helper
-// @version    0.7
+// @version    0.8
 // @description    -| 登录页自动登录 | 解除切换运营商时间限制 | 主页功能球优化 |-
 // @author    NXY666
 // @match    http://10.100.1.5/*
@@ -9,7 +9,6 @@
 // @match    http://a.xujc.com/*
 // @icon    http://a.xujc.com/eportal/interface/index_files/pc/logosuccess.png
 // @grant    unsafeWindow
-// @require    https://code.jquery.com/jquery-3.7.1.min.js
 // @updateURL    https://raw.gitmirror.com/NStudio-Service/TampermonkeyScripts/main/CampusNetworkHelper/main.js
 // @downloadURL    https://raw.gitmirror.com/NStudio-Service/TampermonkeyScripts/main/CampusNetworkHelper/main.js
 // ==/UserScript==
@@ -29,17 +28,62 @@ function getSpareMsgId() {
 	}
 	return "msg" + randomNumber;
 }
-function showMsg(txt) {
-	if (!document.querySelector('#msgBox')) {
-		$("body").append("<div id='msgBox' style='left: 10px; top: 10px; position: fixed;'/>");
+
+function injectStyle(...css) {
+	const styleElement = document.createElement('style');
+	document.head.appendChild(styleElement);
+
+	const styleSheet = styleElement.sheet;
+
+	for (let cssItem of css) {
+		styleSheet.insertRule(cssItem, styleSheet.cssRules.length);
 	}
-	let id = getSpareMsgId(), fullId = "#" + id;
-	$("#msgBox").append(`<div id='${id}' style='font-size: 18px; display: none; background: #43cf78; color: white; overflow: hidden; padding: 10px 15px; margin: 10px; text-align: center; border-radius: 10px; box-shadow: 0 3px 6px rgba(140, 149, 159, 0.15);'>${txt}</div>`);
-	$(fullId).fadeIn();
-	setTimeout(() => {
-		$(fullId).fadeOut();
-		setTimeout(() => {
-			$(fullId).remove();
+}
+function fadeInElement(selector) {
+	const element = document.querySelector(selector);
+	if (element) {
+		element.style.display = 'block';
+		element.classList.add('fade-in');
+	}
+}
+function fadeOutElement(selector) {
+	const element = document.querySelector(selector);
+	if (element) {
+		element.classList.remove('fade-in');
+		element.classList.add('fade-out');
+		setTimeout(function () {
+			element.style.display = 'none';
+		}, 500); // 渐变结束后隐藏元素
+	}
+}
+function removeElement(selector) {
+	const element = document.querySelector(selector);
+	if (element && element.parentNode) {
+		element.parentNode.removeChild(element);
+	}
+}
+
+function showMsg(txt) {
+	if (!document.querySelector('#msg-box')) {
+		const msgBox = document.createElement('div');
+		msgBox.id = 'msg-box';
+		msgBox.classList.add('msg-box');
+		document.body.appendChild(msgBox);
+	}
+	const id = getSpareMsgId(),
+		fullId = "#" + id;
+
+	const messageDiv = document.createElement('div');
+	messageDiv.id = id;
+	messageDiv.classList.add('msg-item');
+	messageDiv.innerHTML = txt;
+	document.querySelector('#msg-box').appendChild(messageDiv);
+
+	fadeInElement(fullId);
+	setTimeout(function () {
+		fadeOutElement(fullId);
+		setTimeout(function () {
+			removeElement(fullId);
 		}, 1000);
 	}, 3000);
 }
@@ -48,9 +92,36 @@ let scriptConfig = JSON.parse(localStorage.CN_LoginScript || JSON.stringify({ski
 
 (function () {
 	try {
+		injectStyle(
+			`@keyframes fade-in { from { opacity: 0; transform: translateX(-30%); } to { opacity: 1; transform: translateX(0); } }`,
+			`@keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }`,
+			`.fade-in { animation: fade-in 0.5s forwards; }`,
+			`.fade-out { animation: fade-out 0.5s forwards; }`,
+			`.msg-box {
+				position: fixed;
+				left: 10px;
+				top: 10px;
+			}`,
+			`.msg-item {
+				font-size: 16px;
+				display: none;
+				background: linear-gradient(45deg, #43CF78, #4AE484);
+				border: 1px solid #43CF78;
+				color: white;
+				overflow: hidden;
+				padding: 10px 15px;
+				margin: 10px;
+				text-align: center;
+				border-radius: 10px;
+				box-shadow: 0 3px 6px rgba(140, 149, 159, 0.15);
+			}`,
+		);
+
+		let pageType, helperState;
+
 		if (scriptConfig.skipCount === 0) {
 			if (document.querySelector('#serviceSwitch')) {
-				showMsg("连接成功");
+				pageType = "连接成功";
 
 				if (scriptConfig.closeWindow) {
 					scriptConfig.closeWindow = false;
@@ -99,7 +170,7 @@ let scriptConfig = JSON.parse(localStorage.CN_LoginScript || JSON.stringify({ski
 					}
 				}, 0);
 			} else if (document.querySelector('#loginLink')) {
-				showMsg("帐号登录");
+				pageType = "账号登录";
 
 				let autoLogin = setInterval(() => {
 					if (document.querySelector('#username').value && document.querySelector('#pwd').value) {
@@ -108,7 +179,7 @@ let scriptConfig = JSON.parse(localStorage.CN_LoginScript || JSON.stringify({ski
 						const displayIsCheckNoEl = document.getElementById("disPlayIs_check_no");
 						if (displayIsCheckNoEl.style.display === "block" || displayIsCheckNoEl.style.display === "") {
 							checkIsSaveInfo();
-							showMsg("记住密码选项已自动勾选");
+							showMsg("已自动勾选记住密码选项");
 							return;
 						}
 
@@ -126,36 +197,41 @@ let scriptConfig = JSON.parse(localStorage.CN_LoginScript || JSON.stringify({ski
 					}
 				}, 0);
 			} else if (document.querySelector('#offlineDiv')) {
-				showMsg("下线过渡");
+				pageType = "下线过渡";
 
 				scriptConfig.skipCount = 1;
 				save(scriptConfig);
 				document.querySelector('#offlineDiv').click();
 			}
 
-			showMsg("状态：启用");
+			helperState = "启用";
 		} else {
 			scriptConfig.skipCount--;
 			save(scriptConfig);
 
-			showMsg(`状态：暂停 ${scriptConfig.skipCount + 1} 次`);
+			helperState = "暂停";
 		}
 
 		// 在页面左下角显示一行
-		let tipNode = document.createElement("span");
+		let tipSpan = document.createElement("span");
 
-		tipNode.innerText = "校园网助手正在代理本页面";
+		let tipText = "校园网助手";
+		if (pageType) {
+			tipText += ` - ${pageType}`;
+		}
+		tipText += ` - ${helperState}`;
+		tipSpan.innerText = tipText;
 
-		tipNode.style.position = "fixed";
-		tipNode.style.left = "5px";
-		tipNode.style.bottom = "5px";
-		tipNode.style.fontSize = "12px";
-		tipNode.style.color = "gray";
-		tipNode.style.pointerEvents = "none";
+		tipSpan.style.position = "fixed";
+		tipSpan.style.left = "5px";
+		tipSpan.style.bottom = "5px";
+		tipSpan.style.fontSize = "12px";
+		tipSpan.style.color = "gray";
+		tipSpan.style.pointerEvents = "none";
 
-		document.body.appendChild(tipNode);
+		document.body.appendChild(tipSpan);
 	} catch (e) {
-		alert(e);
+		console.warn(e);
 		localStorage.removeItem("CN_LoginScript");
 	}
 })();
